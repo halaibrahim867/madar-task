@@ -21,6 +21,8 @@ class EmbeddingService
             }
 
             return $response['data'][0]['embedding'] ?? [];
+//            return array_fill(0, 1536, 0.01); // fake embedding vector
+
         } catch (\Throwable $e) {
             Log::error('Embedding request failed: ' . $e->getMessage());
             return [];

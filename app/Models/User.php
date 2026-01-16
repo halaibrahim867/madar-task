@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(PdfFile::class);
     }
+
+    public function chats()
+    {
+        return $this->hasMany(ChatLog::class);
+    }
 }

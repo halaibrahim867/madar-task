@@ -69,6 +69,11 @@ class PdfService
         foreach ($chunks as $chunk) {
             $embedding = $this->embeddingService->embed($chunk);
 
+// fallback if embedding is empty
+            if (empty($embedding)) {
+                $embedding = array_fill(0, 1536, 0.01); // 1536-dim fake embedding
+            }
+
             $this->pdfChunkRepository->createForPdf($pdfFile, [
                 'content'   => $chunk,
                 'embedding' => json_encode($embedding),

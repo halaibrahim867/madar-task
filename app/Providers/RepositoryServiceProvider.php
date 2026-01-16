@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repository\ChatRepositoryInterface;
+use App\Repository\Eloquent\ChatRepository;
 use App\Repository\Eloquent\PdfChunkRepository;
 use App\Repository\Eloquent\PdfFileRepository;
 use App\Repository\Eloquent\Repository;
@@ -23,6 +25,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(UserRepositoryInterface::class,UserRepository::class);
         $this->app->singleton(PdfFileRepositoryInterface::class,PdfFileRepository::class);
         $this->app->singleton(PdfChunkRepositoryInterface::class,PdfChunkRepository::class);
+        $this->app->singleton(ChatRepositoryInterface::class,ChatRepository::class);
     }
 
     /**
