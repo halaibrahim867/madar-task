@@ -1,24 +1,20 @@
 <?php
-
 namespace App\Services\Api\V1\PDF;
 
 use App\Models\User;
 use App\Repository\PdfChunkRepositoryInterface;
 use App\Repository\PdfFileRepositoryInterface;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Smalot\PdfParser\Parser;
 
 class PdfService
 {
     public function __construct(
         private PdfFileRepositoryInterface $pdfFileRepository,
-        private PdfChunkRepositoryInterface $pdfChunkRepository
+        private PdfChunkRepositoryInterface $pdfChunkRepository,
+        private EmbeddingService $embeddingService,
+        private QdrantService $qdrantService,
     ) {}
 
-    /**
-     * Extract text from a PDF file (pure PHP)
-     */
     public function extractText(string $path): string
     {
         if (!file_exists($path)) {
@@ -36,9 +32,6 @@ class PdfService
         return $text;
     }
 
-    /**
-     * Split text into chunks
-     */
     public function chunkText(string $text, int $size = 500, int $overlap = 50): array
     {
         $words = explode(' ', $text);
@@ -51,39 +44,9 @@ class PdfService
         return $chunks;
     }
 
-
-    /**
-     * Generate OpenAI embeddings with safe fallback
-     */
-    public function embed(string $text): array
-    {
-        try {
-            $response = Http::withToken(config('services.openai.key'))
-                ->post('https://api.openai.com/v1/embeddings', [
-                    'model' => 'text-embedding-3-small',
-                    'input' => $text,
-                ])
-                ->json();
-
-            if (isset($response['error'])) {
-                // Log the OpenAI error and skip embedding
-                Log::warning('OpenAI embedding skipped: ' . $response['error']['message']);
-                return [];
-            }
-
-            return $response['data'][0]['embedding'] ?? [];
-        } catch (\Throwable $e) {
-            Log::error('Embedding request failed: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
-     * Process uploaded PDF: store, extract, chunk, embed safely
-     */
     public function process(User $user, $file)
     {
-        // Store file with .pdf extension
+        // Store PDF
         $storedPath = $file->storeAs('pdfs', $file->hashName() . '.pdf');
 
         $pdfFile = $this->pdfFileRepository->createForUser($user, [
@@ -99,13 +62,36 @@ class PdfService
         // Chunk text
         $chunks = $this->chunkText($text, 150, 25);
 
+        // Ensure Qdrant collection exists
+        $vectorSize = 1536; // for text-embedding-3-small
+        $this->qdrantService->createCollection('pdf_documents', $vectorSize);
+
         foreach ($chunks as $chunk) {
+            $embedding = $this->embeddingService->embed($chunk);
+
             $this->pdfChunkRepository->createForPdf($pdfFile, [
                 'content'   => $chunk,
-                'embedding' => json_encode($this->embed($chunk)),
+                'embedding' => json_encode($embedding),
             ]);
+
+            if (!empty($embedding)) {
+                $this->qdrantService->upsertVector(
+                    'pdf_documents',
+                    $pdfFile->id . '-' . md5($chunk),
+                    $embedding,
+                    ['pdf_id' => $pdfFile->id, 'text' => $chunk]
+                );
+            }
         }
 
         return $pdfFile;
+    }
+
+    public function search(string $query, int $limit = 5)
+    {
+        $embedding = $this->embeddingService->embed($query);
+        if (empty($embedding)) return [];
+
+        return $this->qdrantService->searchVector('pdf_documents', $embedding, $limit);
     }
 }
