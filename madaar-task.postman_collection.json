@@ -1,0 +1,216 @@
+{
+	"info": {
+		"_postman_id": "f932566d-2574-4e83-b5d6-8889ba4e6715",
+		"name": "madaar-task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40637814"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "test@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}login",
+							"host": [
+								"{{local}}login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "pdf",
+			"item": [
+				{
+					"name": "upload pdf",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/D:/downloads/عقد عمل هاله ابراهيم سراج- ممضي  (1).pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}pdf/upload",
+							"host": [
+								"{{local}}pdf"
+							],
+							"path": [
+								"upload"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat",
+			"item": [
+				{
+					"name": "chat",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "query",
+									"value": "what this pdf about ?",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}chat/send",
+							"host": [
+								"{{local}}chat"
+							],
+							"path": [
+								"send"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "test pusher",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "query",
+							"value": "what this pdf about ?",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{local}}test-pusher",
+					"host": [
+						"{{local}}test-pusher"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test qdrant",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6333/collections/pdf_documents",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6333",
+					"path": [
+						"collections",
+						"pdf_documents"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "local",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

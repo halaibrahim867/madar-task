@@ -1,20 +1,33 @@
 <?php
+
 namespace App\Services\Api\V1\PDF;
 
 use App\Models\User;
 use App\Repository\PdfChunkRepositoryInterface;
 use App\Repository\PdfFileRepositoryInterface;
 use Smalot\PdfParser\Parser;
+use Mcpuishor\QdrantLaravel\Facades\Qdrant;
+use Mcpuishor\QdrantLaravel\DTOs\Point;
+use Mcpuishor\QdrantLaravel\PointsCollection;
+use Illuminate\Support\Facades\Log;
 
 class PdfService
 {
+    private string $qdrantCollection;
+    private int $vectorSize;
+
     public function __construct(
         private PdfFileRepositoryInterface $pdfFileRepository,
         private PdfChunkRepositoryInterface $pdfChunkRepository,
         private EmbeddingService $embeddingService,
-        private QdrantService $qdrantService,
-    ) {}
+    ) {
+        $this->qdrantCollection = config('qdrant-laravel.connections.main.collection', 'pdf_documents');
+        $this->vectorSize = (int) config('qdrant-laravel.connections.main.vector_size', 1536);
+    }
 
+    /**
+     * Extract text from PDF
+     */
     public function extractText(string $path): string
     {
         if (!file_exists($path)) {
@@ -23,16 +36,19 @@ class PdfService
 
         $parser = new Parser();
         $pdf = $parser->parseFile($path);
-        $text = $pdf->getText();
+        $text = trim($pdf->getText());
 
-        if (! $text || strlen(trim($text)) < 50) {
+        if (!$text || strlen($text) < 50) {
             throw new \Exception('Empty or unreadable PDF');
         }
 
         return $text;
     }
 
-    public function chunkText(string $text, int $size = 500, int $overlap = 50): array
+    /**
+     * Chunk text into smaller pieces
+     */
+    public function chunkText(string $text, int $size = 150, int $overlap = 25): array
     {
         $words = explode(' ', $text);
         $chunks = [];
@@ -44,10 +60,13 @@ class PdfService
         return $chunks;
     }
 
+    /**
+     * Process PDF: store file, extract chunks, embed, save to DB and Qdrant
+     */
     public function process(User $user, $file)
     {
         // Store PDF
-        $storedPath = $file->storeAs('pdfs', $file->hashName() . '.pdf');
+        $storedPath = $file->storeAs('pdfs', $file->hashName() . '.pdf', 'private');
 
         $pdfFile = $this->pdfFileRepository->createForUser($user, [
             'file_name' => $file->getClientOriginalName(),
@@ -55,48 +74,54 @@ class PdfService
         ]);
 
         $fullPath = storage_path('app/private/' . $storedPath);
-
-        // Extract text
         $text = $this->extractText($fullPath);
-
-        // Chunk text
-        $chunks = $this->chunkText($text, 150, 25);
-
-        // Ensure Qdrant collection exists
-        $vectorSize = 1536; // for text-embedding-3-small
-        $this->qdrantService->createCollection('pdf_documents', $vectorSize);
+        $chunks = $this->chunkText($text);
 
         foreach ($chunks as $chunk) {
             $embedding = $this->embeddingService->embed($chunk);
 
-// fallback if embedding is empty
-            if (empty($embedding)) {
-                $embedding = array_fill(0, 1536, 0.01); // 1536-dim fake embedding
-            }
-
+            // Store in DB
             $this->pdfChunkRepository->createForPdf($pdfFile, [
-                'content'   => $chunk,
+                'content' => $chunk,
                 'embedding' => json_encode($embedding),
             ]);
 
-            if (!empty($embedding)) {
-                $this->qdrantService->upsertVector(
-                    'pdf_documents',
-                    $pdfFile->id . '-' . md5($chunk),
-                    $embedding,
-                    ['pdf_id' => $pdfFile->id, 'text' => $chunk]
-                );
+            // Store in Qdrant (explicit collection)
+            $points = new PointsCollection([
+                new Point(
+                    id: $pdfFile->id . '-' . md5($chunk),
+                    vector: $embedding,
+                    payload: [
+                        'pdf_id' => $pdfFile->id,
+                        'text' => $chunk,
+                    ]
+                )
+            ], $this->qdrantCollection);
+
+            try {
+                Qdrant::points()->upsert($points);
+            } catch (\Throwable $e) {
+                Log::error('Failed to upsert points to Qdrant', [
+                    'exception' => $e,
+                    'pdf_id' => $pdfFile->id,
+                ]);
             }
         }
 
         return $pdfFile;
     }
 
-    public function search(string $query, int $limit = 5)
+    /**
+     * Search in Qdrant
+     */
+    public function search(string $query, int $limit = 5): array
     {
         $embedding = $this->embeddingService->embed($query);
-        if (empty($embedding)) return [];
 
-        return $this->qdrantService->searchVector('pdf_documents', $embedding, $limit);
+        return Qdrant::search()
+            ->vector($embedding)
+            ->limit($limit)
+            ->withPayload()
+            ->get();
     }
 }

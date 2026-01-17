@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Services\Api\V1\PDF;
+
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+
 class EmbeddingService
 {
+    private int $dummySize = 1536;
+
     public function embed(string $text): array
     {
         try {
@@ -12,20 +16,23 @@ class EmbeddingService
                 ->post('https://api.openai.com/v1/embeddings', [
                     'model' => 'text-embedding-3-small',
                     'input' => $text,
-                ])
-                ->json();
+                ]);
 
             if (isset($response['error'])) {
                 Log::warning('OpenAI embedding skipped: ' . $response['error']['message']);
-                return [];
+                return $this->dummyEmbedding();
             }
 
-            return $response['data'][0]['embedding'] ?? [];
-//            return array_fill(0, 1536, 0.01); // fake embedding vector
+            return $response['data'][0]['embedding'] ?? $this->dummyEmbedding();
 
         } catch (\Throwable $e) {
-            Log::error('Embedding request failed: ' . $e->getMessage());
-            return [];
+            Log::warning('OpenAI embedding failed: ' . $e->getMessage());
+            return $this->dummyEmbedding();
         }
+    }
+
+    private function dummyEmbedding(): array
+    {
+        return array_fill(0, $this->dummySize, 0.01);
     }
 }

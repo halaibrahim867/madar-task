@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad8aa9f2eb16fb978826986d978630c2",
+    "content-hash": "9c9ecb30f9344828764f5316440796ee",
     "packages": [
         {
             "name": "brick/math",
@@ -2229,6 +2229,68 @@
                 "source": "https://github.com/marc-mabe/php-enum/tree/v4.7.2"
             },
             "time": "2025-09-14T11:18:39+00:00"
+        },
+        {
+            "name": "mcpuishor/qdrant-laravel",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mcpuishor/qdrant-laravel.git",
+                "reference": "69c17936211a867ee142ba079d2e6aa34860c36c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mcpuishor/qdrant-laravel/zipball/69c17936211a867ee142ba079d2e6aa34860c36c",
+                "reference": "69c17936211a867ee142ba079d2e6aa34860c36c",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "php": "^8.2|^8.3"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.7.0",
+                "pestphp/pest-plugin-laravel": "*",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "QdrantLaravel": "Client"
+                    },
+                    "providers": [
+                        "Mcpuishor\\QdrantLaravel\\QdrantServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mcpuishor\\QdrantLaravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Robert Tudor",
+                    "email": "eu@robert-tudor.com"
+                }
+            ],
+            "description": "A fluent package to interact with Qdrant Vector Database",
+            "keywords": [
+                "laravel",
+                "qdrant",
+                "vector database"
+            ],
+            "support": {
+                "issues": "https://github.com/mcpuishor/qdrant-laravel/issues",
+                "source": "https://github.com/mcpuishor/qdrant-laravel/tree/v0.1.0"
+            },
+            "time": "2025-06-21T11:35:05+00:00"
         },
         {
             "name": "monolog/monolog",

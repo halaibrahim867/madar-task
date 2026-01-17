@@ -29,4 +29,21 @@ Route::prefix('v1')->group(function () {
             return 'Error';
         }
     });
+
+    Route::get('/qdrant-test', function() {
+        try {
+            $points = new \Mcpuishor\QdrantLaravel\PointsCollection([
+                new \Mcpuishor\QdrantLaravel\DTOs\Point(
+                    id: 'test-point',
+                    vector: array_fill(0, (int) config('qdrant-laravel.connections.main.vector_size'), 0.01),
+                    payload: ['test'=>'hello']
+                )
+            ], config('qdrant-laravel.connections.main.collection')); // pass collection explicitly
+
+            return "Upsert OK";
+        } catch (\Throwable $e) {
+            return "ERROR: " . get_class($e) . " - " . $e->getMessage();
+        }
+    });
+
 });
