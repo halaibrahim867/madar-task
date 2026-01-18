@@ -74,7 +74,7 @@ A Laravel-based Retrieval-Augmented Generation (RAG) system that enables authent
 
 ## 🛠 Technology Stack
 
-- **Framework**: Laravel 11.x
+- **Framework**: Laravel 12.x
 - **Authentication**: Laravel Sanctum
 - **WebSocket**: Pusher / Laravel Broadcasting
 - **Database**: MySQL
@@ -82,7 +82,7 @@ A Laravel-based Retrieval-Augmented Generation (RAG) system that enables authent
 - **PDF Processing**: Smalot/PdfParser
 - **AI/LLM**: OpenAI API (GPT-3.5-turbo & text-embedding-3-small)
 - **PDF Text Extraction**: Poppler (pdftotext binary)
-- **PHP**: 8.1+
+- **PHP**: 8.4+
 
 ## 📦 Prerequisites
 
@@ -115,9 +115,6 @@ cd madar-task
 # Install PHP dependencies
 composer install
 
-# Install Node dependencies
-npm install
-```
 
 ### 3. Environment Setup
 
@@ -166,10 +163,6 @@ You can use these credentials to test the authentication and all protected endpo
 ```bash
 # Create storage link
 php artisan storage:link
-
-# Set permissions
-chmod -R 775 storage bootstrap/cache
-```
 
 ## ⚙️ Configuration
 
@@ -284,7 +277,7 @@ Use the seeded test user credentials:
 
 **Request:**
 ```bash
-POST /api/v1/login
+POST /api/v1/auth/login
 Content-Type: application/json
 
 {
@@ -368,35 +361,6 @@ Content-Type: application/json
 4. AI response is returned via API
 5. Same response is broadcasted via WebSocket to `private-chat.{userId}`
 
-```javascript
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
-
-window.Pusher = Pusher;
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: process.env.MIX_PUSHER_APP_KEY,
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-    forceTLS: true,
-    authEndpoint: '/api/v1/broadcasting/auth',
-    auth: {
-        headers: {
-            Authorization: 'Bearer ' + authToken
-        }
-    }
-});
-
-// Subscribe to private chat channel
-const channel = window.Echo.private(`chat.${userId}`);
-
-// Listen for chat messages
-channel.listen('ChatMessage', (data) => {
-    console.log('AI Response:', data.message);
-    console.log('User:', data.user);
-    // Display the response in your UI
-});
-```
 
 ## 📚 API Documentation
 
@@ -409,7 +373,6 @@ channel.listen('ChatMessage', (data) => {
 | POST | `/api/v1/chat/send` | Send chat query | Yes |
 | GET | `/api/v1/test-pusher` | Test Pusher broadcasting | No |
 | GET | `/api/v1/qdrant-test` | Test Qdrant connection | No |
-| POST | `/api/v1/broadcasting/auth` | Authenticate WebSocket | Yes |
 
 ### Error Response Format
 
@@ -716,7 +679,7 @@ curl http://localhost:8000/api/v1/test-pusher
 
 3. **Test Authentication:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/login \
+curl -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password"}'
 ```
@@ -779,16 +742,6 @@ php artisan test --testsuite=Feature
 - ✅ **Error Handling**: Comprehensive logging and graceful degradation
 - ✅ **Test Endpoints**: Qdrant and Pusher connectivity tests
 
-### ⚠️ Current Limitations
-
-- ⚠️ **No Frontend**: WebSocket events broadcasted but not consumed
-- ⚠️ **Synchronous Processing**: PDFs processed in real-time (no queue)
-- ⚠️ **Single User Seed**: Only one test user provided
-- ⚠️ **No PDF Management**: Cannot list or delete uploaded PDFs (yet)
-- ⚠️ **No Chat History**: Conversations not persisted (yet)
-
-## 🔒 Security Considerations
-
 ### Implemented Security Measures
 
 1. **Authentication**: All API endpoints and WebSocket connections require valid authentication tokens
@@ -836,28 +789,3 @@ The project follows:
 - **PSR-12 coding standards**: Laravel community conventions
 - **RESTful API conventions**: Proper HTTP methods and status codes
 - **Laravel best practices**: Eloquent ORM, form validation, middleware
-
-## 🤝 Contributing
-
-This is a task submission project. For any questions or suggestions, please contact the repository owner.
-
-## 📄 License
-
-This project is created as a technical assessment for Madaar Solutions.
-
-## 👤 Author
-
-**Hala Ibrahim**
-- GitHub: [@halaibrahim867](https://github.com/halaibrahim867)
-
-## 🙏 Acknowledgments
-
-- Madaar Solutions for the interesting technical challenge
-- Laravel community for excellent documentation
-- OpenAI for the GPT and Embeddings API
-- Qdrant team for the powerful vector database
-- mcpuishor for the excellent Laravel-Qdrant integration package
-
----
-
-**Note**: This project was developed as part of a technical assessment. The system implements robust error handling with automatic fallback to dummy embeddings when OpenAI API calls fail, ensuring the application remains functional during development and handles production errors gracefully.
