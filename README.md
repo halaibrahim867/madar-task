@@ -1,59 +1,82 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Madaar Solutions – Mini RAG System with WebSocket Streaming (Laravel)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A **Mini Retrieval-Augmented Generation (RAG) System** built with Laravel that allows authenticated users to upload PDF files and chat with a language model (LLM) that answers questions based on the uploaded content, with **real-time streamed responses** via WebSocket.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Table of Contents
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. [System Architecture & Design](#system-architecture--design)  
+2. [End-to-End Data Flow](#end-to-end-data-flow)  
+3. [Local Setup & Run Instructions](#local-setup--run-instructions)  
+4. [How to Use](#how-to-use)  
+   - [Authenticate](#authenticate)  
+   - [Upload a PDF](#upload-a-pdf)  
+   - [Connect to WebSocket & Chat](#connect-to-websocket--chat)  
+5. [Environment Variables & API Keys](#environment-variables--api-keys)  
+6. [Dependencies & Libraries](#dependencies--libraries)  
+7. [Sample Flow / Example](#sample-flow--example)  
+8. [Troubleshooting & Notes](#troubleshooting--notes)  
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## System Architecture & Design
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Authentication:** Laravel Sanctum (or Passport) ensures all API and WebSocket requests are authenticated.  
+- **PDF Handling:** Users upload PDFs → text extraction → chunking → embeddings → store in Qdrant (vector database).  
+- **Vector Storage:** Qdrant stores embeddings for semantic search. Each PDF is scoped per user.  
+- **WebSocket Chat:** Users connect to `/ws/chat` → query sent → relevant PDF chunks retrieved → query LLM → response streamed in real-time.  
+- **Design Principles:** Clean Code, SOLID, API versioning (`/api/v1/...`), modular and extensible.  
+- **Security:** Unauthorized WebSocket connections rejected instantly, logged, and monitored.  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## End-to-End Data Flow
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. **User Authentication:** User logs in → receives API token.  
+2. **PDF Upload:** User uploads PDF → validated → text extracted → chunked → embeddings generated.  
+3. **Vector Storage:** Embeddings upserted into Qdrant, scoped by user.  
+4. **Query via WebSocket:** User sends a message → system retrieves relevant chunks → sends to LLM → streams response back in real-time.  
+5. **Response Handling:** WebSocket client receives partial response continuously until completion.  
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Local Setup & Run Instructions
 
-## Contributing
+### Requirements
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- PHP 7.3+  
+- Composer  
+- MySQL/PostgreSQL  
+- Node.js (optional for front-end testing)  
+- Docker (for Qdrant)  
 
-## Code of Conduct
+### Steps
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Clone the repository
+git clone https://github.com/halaibrahim867/madar-task.git
+cd madar-task
 
-## Security Vulnerabilities
+# Install PHP dependencies
+composer install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Install Node dependencies (optional)
+npm install
+npm run dev   # or npm run build for production
 
-## License
+# Copy environment variables
+cp .env.example .env
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Generate Laravel app key
+php artisan key:generate
+
+# Configure DB in .env then run migrations
+php artisan migrate --seed
+php artisan storage:link
+
+# Start Laravel server
+php artisan serve --host=0.0.0.0 --port=8000
+
+# Start queue worker
+php artisan queue:work --tries=3
