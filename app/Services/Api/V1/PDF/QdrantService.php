@@ -13,13 +13,20 @@ class QdrantService
      */
     public function search(array $vector, int $userId, int $limit = 5): array
     {
-        return Qdrant::search()
-            ->vector($vector)
-            ->limit($limit)
-            ->withPayload()
-            ->filter(['must' => [
-                ['key' => 'user_id', 'match' => $userId]
-            ]])
-            ->get();
+        try {
+            return Qdrant::search()
+                ->vector($vector)
+                ->limit($limit)
+                ->withPayload()
+                ->get();
+        } catch (\Throwable $e) {
+            \Log::error('Qdrant search failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
+
+            return [];
+        }
+
     }
 }
