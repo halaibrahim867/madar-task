@@ -1,216 +1,248 @@
 {
-	"info": {
-		"_postman_id": "f932566d-2574-4e83-b5d6-8889ba4e6715",
-		"name": "madaar-task",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "40637814"
-	},
-	"item": [
-		{
-			"name": "auth",
-			"item": [
-				{
-					"name": "login",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "email",
-									"value": "test@example.com",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "password123",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{local}}login",
-							"host": [
-								"{{local}}login"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "pdf",
-			"item": [
-				{
-					"name": "upload pdf",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "file",
-									"type": "file",
-									"src": "/D:/downloads/عقد عمل هاله ابراهيم سراج- ممضي  (1).pdf"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{local}}pdf/upload",
-							"host": [
-								"{{local}}pdf"
-							],
-							"path": [
-								"upload"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Chat",
-			"item": [
-				{
-					"name": "chat",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "query",
-									"value": "what this pdf about ?",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{local}}chat/send",
-							"host": [
-								"{{local}}chat"
-							],
-							"path": [
-								"send"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "test pusher",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "query",
-							"value": "what this pdf about ?",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{local}}test-pusher",
-					"host": [
-						"{{local}}test-pusher"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "test qdrant",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:6333/collections/pdf_documents",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "6333",
-					"path": [
-						"collections",
-						"pdf_documents"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"variable": [
-		{
-			"key": "local",
-			"value": "",
-			"type": "default"
-		}
-	]
+  "info": {
+    "_postman_id": "f932566d-2574-4e83-b5d6-8889ba4e6715",
+    "name": "madaar-task",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "40637814"
+  },
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "email",
+                  "value": "test@example.com",
+                  "type": "text",
+                  "uuid": "ce1e966b-5fff-4c23-8daa-a6ab125b207f"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "text",
+                  "uuid": "42b7e19a-0620-441a-9201-6c49b3357c21"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{local}}auth/login",
+              "host": [
+                "{{local}}auth"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "pdf",
+      "item": [
+        {
+          "name": "upload pdf",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "1|5mNpEN2AiOtUY02I4nV44JBLg7puVslWGjcHrfZ82cdfc2c4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "67dc8369-28dd-4cde-9326-e7c168892ecc",
+                  "src": "/D:/downloads/cv/Hala-Ibrahim-CV.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{local}}pdf/upload",
+              "host": [
+                "{{local}}pdf"
+              ],
+              "path": [
+                "upload"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "chat",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "1|5mNpEN2AiOtUY02I4nV44JBLg7puVslWGjcHrfZ82cdfc2c4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "query",
+                  "type": "text",
+                  "uuid": "42b7e19a-0620-441a-9201-6c49b3357c21",
+                  "value": "can you explain pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{local}}chat/send",
+              "host": [
+                "{{local}}chat"
+              ],
+              "path": [
+                "send"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "test pusher",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "query",
+              "type": "text",
+              "uuid": "42b7e19a-0620-441a-9201-6c49b3357c21",
+              "value": "what this pdf about ?"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{local}}test-pusher",
+          "host": [
+            "{{local}}test-pusher"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "test qdrant",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "1|Sy9bQps4BjvLktiX8dvudXF9jlPHKzW3MYozq8Se3073c11d",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "query",
+              "type": "text",
+              "uuid": "42b7e19a-0620-441a-9201-6c49b3357c21",
+              "value": "what this pdf about ?"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{local}}qdrant-test",
+          "host": [
+            "{{local}}qdrant-test"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "local",
+      "value": "",
+      "type": "default"
+    }
+  ]
 }
