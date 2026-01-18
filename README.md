@@ -45,10 +45,9 @@ A **Mini Retrieval-Augmented Generation (RAG) System** built with Laravel that a
 
 ### Requirements
 
-- PHP 7.3+  
+- PHP 8.3+  
 - Composer  
-- MySQL/PostgreSQL  
-- Node.js (optional for front-end testing)  
+- MySQL
 - Docker (for Qdrant)  
 
 ### Steps
@@ -61,10 +60,6 @@ cd madar-task
 # Install PHP dependencies
 composer install
 
-# Install Node dependencies (optional)
-npm install
-npm run dev   # or npm run build for production
-
 # Copy environment variables
 cp .env.example .env
 
@@ -73,10 +68,6 @@ php artisan key:generate
 
 # Configure DB in .env then run migrations
 php artisan migrate --seed
-php artisan storage:link
 
 # Start Laravel server
-php artisan serve --host=0.0.0.0 --port=8000
-
-# Start queue worker
-php artisan queue:work --tries=3
+php artisan serve
