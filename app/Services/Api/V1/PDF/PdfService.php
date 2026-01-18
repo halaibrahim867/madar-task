@@ -94,6 +94,7 @@ class PdfService
                     payload: [
                         'pdf_id' => $pdfFile->id,
                         'text' => $chunk,
+                        'user_id' => $user->id,
                     ]
                 )
             ], $this->qdrantCollection);

@@ -20,8 +20,8 @@ class ChatController extends Controller
         $user = $request->user();
         $query = $request->input('query');
 
-        // Generate full response (not streaming via HTTP)
-        $answer = $this->chatService->generateResponse($query);
+        // Pass the authenticated user's ID to generateResponse
+        $answer = $this->chatService->generateResponse($query, $user->id);
 
         // Broadcast response via Pusher/WebSocket
         broadcast(new ChatMessage($user, $answer));

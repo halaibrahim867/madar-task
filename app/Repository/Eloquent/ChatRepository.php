@@ -16,9 +16,9 @@ class ChatRepository extends Repository implements ChatRepositoryInterface
         $this->qdrantService = $qdrantService;
     }
 
-    public function getRelevantChunks(array $embedding, int $limit = 3): array
+    public function getRelevantChunks(array $embedding, int $userId, int $limit = 3): array
     {
-        $results = $this->qdrantService->search($embedding, $limit);
+        $results = $this->qdrantService->search($embedding, $userId, $limit);
 
         $chunks = [];
         foreach ($results['result'] ?? [] as $res) {
@@ -30,4 +30,5 @@ class ChatRepository extends Repository implements ChatRepositoryInterface
 
         return $chunks;
     }
+
 }
